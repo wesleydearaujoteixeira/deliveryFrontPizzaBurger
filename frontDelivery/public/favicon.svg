@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Selo da marca: badge vermelho com hamburguer + fatia de pizza (versao mini do LogoMark) -->
+  <rect width="48" height="48" rx="12" fill="#d62300"/>
+  <g transform="translate(4 4) scale(0.84)">
+    <path d="M4 27a12 9 0 0 1 24 0v1H4z" fill="#FFB52E"/>
+    <rect x="4" y="28.6" width="24" height="4.2" rx="2.1" fill="#5C2E11"/>
+    <rect x="4" y="33.2" width="24" height="2.4" rx="1.2" fill="#FFD54F"/>
+    <rect x="4" y="36" width="24" height="4.6" rx="2.3" fill="#FFB52E"/>
+    <g transform="rotate(14 34 24)">
+      <rect x="24" y="7" width="20" height="5.5" rx="2.75" fill="#FFB52E" stroke="#fff" stroke-width="1.6"/>
+      <path d="M25.5 12.5 L42.5 12.5 L34 33.5 Z" fill="#FFE0B2" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="31" cy="17.5" r="2" fill="#D62300"/>
+      <circle cx="37.5" cy="17" r="2" fill="#D62300"/>
+      <circle cx="34" cy="24" r="2" fill="#D62300"/>
+    </g>
+  </g>
+</svg>

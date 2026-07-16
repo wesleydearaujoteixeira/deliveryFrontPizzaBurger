@@ -1,0 +1,9 @@
+{
+  "name": "Delivery - Pizzaria & Hamburgueria",
+  "short_name": "Delivery",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#16161a",
+  "theme_color": "#f43f1e",
+  "icons": []
+}

@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+/* darkMode: 'class' (Tailwind 4) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Paleta inspirada nas grandes redes de fast-food (vermelho flame,
+ * marrom bbq, creme e amarelo melty) + fonte display arredondada.
+ */
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Baloo 2', 'Inter', system-ui, sans-serif;
+
+  --color-brand-50: #fef3ee;
+  --color-brand-100: #fce1d4;
+  --color-brand-200: #f9bfa4;
+  --color-brand-300: #f4936a;
+  --color-brand-400: #e85a2c;
+  --color-brand-500: #d62300;
+  --color-brand-600: #b81d00;
+  --color-brand-700: #93190a;
+  --color-brand-800: #6f1a0e;
+  --color-brand-900: #502314;
+
+  /* Amarelo "melty" para precos e destaques */
+  --color-accent-300: #ffd580;
+  --color-accent-400: #ffbe33;
+  --color-accent-500: #ffaa00;
+  --color-accent-600: #e69900;
+
+  /* Marrom bbq escuro para textos sobre fundo claro */
+  --color-cocoa: #3e1a0c;
+
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #16161a;
+  --color-surface-light-2: #faf3e0; /* branco amarelado, como no BK */
+  --color-surface-dark-2: #1f1f25;
+
+  --shadow-card: 0 2px 12px rgba(80, 35, 20, 0.08);
+  --shadow-card-dark: 0 2px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Esconde a barra de rolagem mantendo o scroll (carrosseis horizontais) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-surface-light-2 text-cocoa antialiased dark:bg-surface-dark dark:text-zinc-100;
+  }
+
+  /* Titulos com a fonte display, como nos cardapios de fast-food */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  /* Glassmorphism sutil para headers e modais */
+  .glass {
+    @apply border border-white/10 bg-white/70 backdrop-blur-xl dark:bg-surface-dark-2/70;
+  }
+}
