@@ -53,6 +53,18 @@
     @apply bg-surface-light-2 text-cocoa antialiased dark:bg-surface-dark dark:text-zinc-100;
   }
 
+  /* Tailwind 4 trocou o cursor padrao dos botoes para "default" (no v3 era
+     pointer); restaura o affordance de clique nos elementos interativos */
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  select:not(:disabled),
+  summary,
+  label[for],
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* Titulos com a fonte display, como nos cardapios de fast-food */
   h1,
   h2,
