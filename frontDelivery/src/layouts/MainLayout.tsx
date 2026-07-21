@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { Avatar } from '@/components/ui/Avatar';
 import { CartDrawer } from '@/components/CartDrawer';
 import { Footer } from '@/components/Footer';
+import { Location } from '@/components/Location';
 import { Logo } from '@/components/Logo';
 
 export function MainLayout() {
@@ -101,6 +102,8 @@ export function MainLayout() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <Outlet />
       </main>
+
+      <Location />
 
       <Footer />
 
