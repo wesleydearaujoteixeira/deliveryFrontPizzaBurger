@@ -1,0 +1,117 @@
+# Pipeline CI/CD — Delivery Pizza & Burger (frontend Vite/React)
+#
+# Layout do repo:
+#   deliveryFrontPizzaBurger/        <- raiz do git (aqui vive .vercel/ e este workflow)
+#   └── frontDelivery/               <- o app (package.json, vite, src/)
+#
+# Fluxo:
+#   Pull Request  -> quality (typecheck+test+build) -> deploy PREVIEW  (URL temporária)
+#   Push na main  -> quality (typecheck+test+build) -> deploy PRODUÇÃO (--prod)
+name: CI/CD
+
+on:
+  push:
+    branches: [main]      # merge/push na main  => produção
+  pull_request:           # qualquer PR          => preview
+
+# Cancela execuções antigas do mesmo branch/PR quando você faz um novo push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Identificam o projeto Vercel para o `vercel pull`. Vêm dos Secrets do repo.
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────
+  # 1) PORTÕES DE QUALIDADE (CI) — roda sempre, não precisa de secret.
+  #    Se algo aqui falhar, os jobs de deploy nem começam.
+  # ────────────────────────────────────────────────────────────────
+  quality:
+    name: Lint / Typecheck / Test / Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontDelivery   # comandos npm rodam dentro do app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontDelivery/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Typecheck (tsc)
+        run: npx tsc -b
+
+      - name: Testes (vitest)
+        # --passWithNoTests deixa verde enquanto não há testes;
+        # vira gate de verdade assim que você criar arquivos *.test.tsx
+        run: npx vitest run --passWithNoTests
+
+      - name: Build de verificação
+        run: npm run build
+
+  # ────────────────────────────────────────────────────────────────
+  # 2) DEPLOY PREVIEW — só em Pull Requests. Gera uma URL temporária
+  #    para revisar as mudanças antes do merge.
+  # ────────────────────────────────────────────────────────────────
+  deploy-preview:
+    name: Deploy Preview (Vercel)
+    needs: quality
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Vercel CLI
+        run: npm i -g vercel@latest
+
+      # `vercel pull` baixa as configs/variáveis do ambiente Preview.
+      # Roda na RAIZ do repo, onde o projeto está linkado (.vercel/).
+      - name: Vercel pull (preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Vercel build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Vercel deploy (preview)
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Preview URL: $url"
+          echo "### 🔎 Preview pronto: $url" >> "$GITHUB_STEP_SUMMARY"
+
+  # ────────────────────────────────────────────────────────────────
+  # 3) DEPLOY PRODUÇÃO — só em push na main. Publica no domínio real.
+  # ────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy Produção (Vercel)
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Vercel pull (production)
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Vercel build (--prod)
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Vercel deploy (--prod)
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Produção: $url"
+          echo "### 🚀 Deploy de produção: $url" >> "$GITHUB_STEP_SUMMARY"
