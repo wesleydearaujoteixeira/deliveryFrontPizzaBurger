@@ -2,10 +2,11 @@ import { MapPin, Navigation, Clock } from 'lucide-react';
 
 /** Dados da loja. Troque o endereco/coordenadas que o mapa acompanha. */
 const STORE = {
-  address: 'R. 49, 37, Maracanaú, Ceará, Brasil, 61901-110',
+  address: 'Av. dos Sabores, 1234 — Centro, Fortaleza/CE',
   hours: 'Ter a Dom · 18h às 23h30',
-  lat: -3.8815283,
-  lon: -38.6182758,
+  // Endereco de demo: mapa centrado no Centro de Fortaleza.
+  lat: -3.7281287,
+  lon: -38.527412,
 };
 
 // Recorte do mapa em volta da loja (quanto menor o delta, mais zoom).
