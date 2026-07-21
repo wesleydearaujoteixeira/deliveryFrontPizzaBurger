@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useStoreStatus } from '@/hooks/useCatalog';
 import { Button } from '@/components/ui/Button';
 import { formatBRL } from '@/utils/currency';
+import { borderLabel, borderPrice, cartItemLabel } from '@/utils/pizza';
 
 export function CartDrawer() {
   const { items, subtotal, isOpen, closeCart, remove, setQuantity } = useCart();
@@ -67,8 +68,8 @@ export function CartDrawer() {
             ) : (
               <>
                 <ul className="flex-1 divide-y divide-zinc-100 overflow-y-auto p-4 dark:divide-zinc-800">
-                  {items.map(({ product, quantity }) => (
-                    <li key={product.uuid} className="flex gap-3 py-3">
+                  {items.map(({ key, product, quantity, customization, unitPrice }) => (
+                    <li key={key} className="flex gap-3 py-3">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
@@ -80,21 +81,30 @@ export function CartDrawer() {
                       )}
                       <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between gap-2">
-                          <span className="text-sm font-semibold">{product.name}</span>
+                          <span className="text-sm font-semibold">
+                            {cartItemLabel(product, customization)}
+                          </span>
                           <button
-                            onClick={() => remove(product.uuid)}
+                            onClick={() => remove(key)}
                             aria-label={`Remover ${product.name}`}
                             className="text-zinc-400 hover:text-red-500"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
+                        {customization && customization.border !== 'NONE' && (
+                          <span className="text-xs text-zinc-500">
+                            {borderLabel(customization.border)}
+                            {borderPrice(customization.border) > 0 &&
+                              ` (+${formatBRL(borderPrice(customization.border))})`}
+                          </span>
+                        )}
                         <span className="text-sm text-zinc-500">
-                          {formatBRL(product.basePrice)}
+                          {formatBRL(unitPrice)}
                         </span>
                         <div className="mt-1 flex items-center gap-3">
                           <button
-                            onClick={() => setQuantity(product.uuid, quantity - 1)}
+                            onClick={() => setQuantity(key, quantity - 1)}
                             aria-label="Diminuir quantidade"
                             className="rounded-lg bg-zinc-100 p-1.5 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
                           >
@@ -102,14 +112,14 @@ export function CartDrawer() {
                           </button>
                           <span className="w-6 text-center text-sm font-semibold">{quantity}</span>
                           <button
-                            onClick={() => setQuantity(product.uuid, quantity + 1)}
+                            onClick={() => setQuantity(key, quantity + 1)}
                             aria-label="Aumentar quantidade"
                             className="rounded-lg bg-zinc-100 p-1.5 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                           <span className="ml-auto text-sm font-bold">
-                            {formatBRL(product.basePrice * quantity)}
+                            {formatBRL(unitPrice * quantity)}
                           </span>
                         </div>
                       </div>

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/Button';
 import { OrderStatusChip } from '@/components/OrderStatusChip';
 import { formatBRL } from '@/utils/currency';
 import { ORDER_STEPS, PAYMENT_LABEL, STATUS_LABEL } from '@/utils/orderStatus';
+import { BORDER_LABELS } from '@/utils/pizza';
 import type { OrderStatus } from '@/types';
 
 const STEP_ICON: Record<string, typeof ChefHat> = {
@@ -196,15 +197,20 @@ export function OrderTrackingPage() {
       <Card className="flex flex-col gap-3">
         <h3 className="font-bold">Itens</h3>
         <ul className="flex flex-col gap-3">
-          {order.items.map((item) => (
-            <li key={item.productUuid} className="flex items-center gap-3">
+          {order.items.map((item, index) => (
+            <li key={`${item.productUuid}-${index}`} className="flex items-center gap-3">
               {item.imageUrl ? (
                 <img src={item.imageUrl} alt="" className="h-12 w-12 rounded-xl object-cover" />
               ) : (
                 <div className="h-12 w-12 rounded-xl bg-zinc-100 dark:bg-zinc-800" />
               )}
               <div className="flex-1">
-                <p className="text-sm font-semibold">{item.name}</p>
+                <p className="text-sm font-semibold">
+                  {item.halfFlavorName ? `½ ${item.name} / ½ ${item.halfFlavorName}` : item.name}
+                </p>
+                {item.border && item.border !== 'NONE' && (
+                  <p className="text-xs text-zinc-500">{BORDER_LABELS[item.border]}</p>
+                )}
                 <p className="text-xs text-zinc-500">
                   {item.quantity}x {formatBRL(item.unitPrice)}
                 </p>

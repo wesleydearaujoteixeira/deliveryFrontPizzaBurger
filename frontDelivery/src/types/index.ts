@@ -47,9 +47,29 @@ export interface StoreStatus {
   etaMaxMinutes: number;
 }
 
+export type PizzaBorder =
+  | 'NONE'
+  | 'REQUEIJAO'
+  | 'CATUPIRY'
+  | 'CREAM_CHEESE'
+  | 'CHEDDAR'
+  | 'CHOCOLATE'
+  | 'AVELA';
+
+/** Personalizacao de pizza: segundo sabor (meio a meio) e borda recheada. */
+export interface PizzaCustomization {
+  halfFlavor?: Product;
+  border: PizzaBorder;
+}
+
 export interface CartItem {
+  /** Identidade da linha: produto + personalizacao (permite duas pizzas iguais com bordas diferentes). */
+  key: string;
   product: Product;
   quantity: number;
+  customization?: PizzaCustomization;
+  /** Preco ja com a regra do meio a meio (sabor mais caro) e o acrescimo da borda. */
+  unitPrice: number;
 }
 
 export type OrderStatus =
@@ -78,6 +98,8 @@ export interface OrderItem {
   unitPrice: number;
   quantity: number;
   totalPrice: number;
+  halfFlavorName: string | null;
+  border: PizzaBorder | null;
 }
 
 export interface Order {
