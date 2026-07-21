@@ -1,7 +1,10 @@
+import { useMemo, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useCategories, useProducts, useStoreStatus } from '@/hooks/useCatalog';
 import { useCart } from '@/context/CartContext';
 import { CategoryCarousel } from '@/components/CategoryCarousel';
 import { HeroCarousel } from '@/components/HeroCarousel';
+import { PizzaModal } from '@/components/PizzaModal';
 import { StoreStatusCard } from '@/components/StoreStatusCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import type { Product } from '@/types';
@@ -13,10 +16,25 @@ export function HomePage() {
   const { data: products, isLoading } = useProducts(undefined, 0, 150);
   const { data: storeStatus } = useStoreStatus();
   const { add } = useCart();
+  // Pizza clicada: abre o modal de personalizacao (2 sabores, borda, bebida)
+  const [selectedPizza, setSelectedPizza] = useState<Product | null>(null);
+
+  const pizzas = useMemo(
+    () => products?.content.filter((p) => p.type === 'PIZZA') ?? [],
+    [products],
+  );
+  const drinks = useMemo(
+    () => products?.content.filter((p) => p.type === 'DRINK') ?? [],
+    [products],
+  );
 
   const handleSelect = (product: Product) => {
     if (storeStatus && !storeStatus.open) {
       toast.error('A loja está fechada no momento');
+      return;
+    }
+    if (product.type === 'PIZZA') {
+      setSelectedPizza(product);
       return;
     }
     add(product);
@@ -87,6 +105,17 @@ export function HomePage() {
       {products && products.content.length === 0 && (
         <p className="py-12 text-center text-zinc-500">Nenhum produto no cardapio ainda.</p>
       )}
+
+      <AnimatePresence>
+        {selectedPizza && (
+          <PizzaModal
+            product={selectedPizza}
+            pizzas={pizzas}
+            drinks={drinks}
+            onClose={() => setSelectedPizza(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

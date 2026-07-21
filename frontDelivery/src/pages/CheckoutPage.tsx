@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { formatBRL } from '@/utils/currency';
+import { BORDER_LABELS, cartItemLabel } from '@/utils/pizza';
 import type { PaymentMethod } from '@/types';
 
 const schema = z.object({
@@ -64,7 +65,12 @@ export function CheckoutPage() {
   const onSubmit = async (data: FormData) => {
     try {
       const order = await createOrder.mutateAsync({
-        items: items.map((i) => ({ productUuid: i.product.uuid, quantity: i.quantity })),
+        items: items.map((i) => ({
+          productUuid: i.product.uuid,
+          quantity: i.quantity,
+          halfFlavorUuid: i.customization?.halfFlavor?.uuid,
+          border: i.customization?.border,
+        })),
         paymentMethod: data.paymentMethod,
         address: {
           street: data.street,
@@ -173,13 +179,18 @@ export function CheckoutPage() {
         <Card className="flex flex-col gap-4 lg:sticky lg:top-20">
           <h2 className="font-bold">Resumo do pedido</h2>
           <ul className="flex flex-col gap-2">
-            {items.map(({ product, quantity }) => (
-              <li key={product.uuid} className="flex justify-between gap-2 text-sm">
+            {items.map(({ key, product, quantity, customization, unitPrice }) => (
+              <li key={key} className="flex justify-between gap-2 text-sm">
                 <span className="text-zinc-600 dark:text-zinc-300">
-                  {quantity}x {product.name}
+                  {quantity}x {cartItemLabel(product, customization)}
+                  {customization && customization.border !== 'NONE' && (
+                    <span className="block text-xs text-zinc-400">
+                      {BORDER_LABELS[customization.border]}
+                    </span>
+                  )}
                 </span>
                 <span className="shrink-0 font-medium">
-                  {formatBRL(product.basePrice * quantity)}
+                  {formatBRL(unitPrice * quantity)}
                 </span>
               </li>
             ))}
